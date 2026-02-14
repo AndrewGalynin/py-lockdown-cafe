@@ -1,5 +1,5 @@
 import datetime
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from app.errors import (
     NotVaccinatedError,
@@ -18,9 +18,15 @@ class Cafe:
         if "vaccine" not in visitor:
             raise NotVaccinatedError(f"Visitor {name} is not vaccinated.")
 
-        expiration_date: datetime.date = visitor["vaccine"].get(
+        expiration_date: Optional[datetime.date] = visitor["vaccine"].get(
             "expiration_date"
         )
+
+        if expiration_date is None:
+            raise NotVaccinatedError(
+                f"Visitor {name}'s "
+                f"vaccine record is missing an expiration date."
+            )
 
         if expiration_date < datetime.date.today():
             raise OutdatedVaccineError(f"Visitor {name}'s vaccine is expired.")
